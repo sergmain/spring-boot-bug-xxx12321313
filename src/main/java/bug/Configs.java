@@ -10,8 +10,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
 
 /**
  * @author Sergio Lissner
@@ -25,10 +23,43 @@ public class Configs {
 
     public static final String REST_REALM = "REST realm";
 
+    @Configuration
+    @Order(1)
+    @Profile("profile26")
+    public static class ConfigRest26 extends WebSecurityConfigurerAdapter {
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            initRestSecurity(http);
+        }
+    }
+
+    @Configuration
+    @Profile("profile26")
+    public static class Config26 extends WebSecurityConfigurerAdapter {
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            initSecurity(http);
+        }
+    }
+
     @Bean
     @Order(0)
+    @Profile("profile27")
     public SecurityFilterChain restFilterChain(HttpSecurity http) throws Exception {
+        initRestSecurity(http);
+        return http.build();
+    }
 
+    @Bean
+    @Order(1)
+    @Profile("profile27")
+    public SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
+        initSecurity(http);
+        return http.build();
+    }
+
+    private static void initRestSecurity(HttpSecurity http) throws Exception {
         http
                 .antMatcher("/rest/**/**").sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -39,13 +70,9 @@ public class Configs {
                 .antMatcher("/rest/**/**").httpBasic().realmName(REST_REALM)
                 .and()
                 .antMatcher("/rest/**/**").csrf().disable().headers().cacheControl();
-
-        return http.build();
     }
 
-    @Bean
-    @Order(1)
-    public SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
+    private static void initSecurity(HttpSecurity http) throws Exception {
         http
                 .headers().frameOptions().sameOrigin()
                 .and()
@@ -69,6 +96,5 @@ public class Configs {
                 .logout()
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/index");
-        return http.build()
     }
 }

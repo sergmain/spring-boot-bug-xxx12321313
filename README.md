@@ -1,4 +1,4 @@
-# spring-boot-bug-xxx12321313
+# spring-boot-multi-security-filter-chain
 
 you have to use one of profiles: profile26 or profile27
 

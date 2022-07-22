@@ -53,6 +53,30 @@ public class SimpleControllerTest {
         }
     }
 
+    @ExtendWith(SpringExtension.class)
+    @SpringBootTest
+    @ActiveProfiles("profile27")
+    @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+    @AutoConfigureCache
+    public static class TestAccessForAllEndPointsProfile27 {
+
+        private MockMvc mockMvc;
+
+        @Autowired
+        private WebApplicationContext webApplicationContext;
+
+        @BeforeEach
+        public void setup() {
+            this.mockMvc = webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
+        }
+
+        @Test
+        public void testAnonymousAccessRestriction() throws Exception {
+            checkAccessRestriction(mockMvc, ACCOUNT_URLS);
+            checkRestAccessRestriction(mockMvc, ACCOUNT_REST_URLS);
+        }
+    }
+
     private enum AccessMethod {POST, GET}
 
     @Data
